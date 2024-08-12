@@ -1,7 +1,7 @@
 
-set(WALLET_NAME "KarbowanecWallet")
-set(CN_CURRENCY_DISPLAY_NAME "Karbo")
-set(CN_CURRENCY_TICKER "KRB")
+set(WALLET_NAME "DogemoneWallet")
+set(CN_CURRENCY_DISPLAY_NAME "Dogemone")
+set(CN_CURRENCY_TICKER "DME")
 
 # Get version number from git tag, parse it and split into separate components
 find_package(Git)
@@ -35,7 +35,7 @@ if(GIT_FOUND)
 
     message(STATUS "Wallet git tag: ${WALLET_GIT_TAG}")
   endif()
-endif()  
+endif()
 
 set(WALLET_VER_BUILD 1) # this one was always 1 anyways
 
