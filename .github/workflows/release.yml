@@ -108,7 +108,7 @@ jobs:
             **${{ steps.pack.outputs.release_name_archive }}**
             ${{ steps.pack.outputs.sha256a }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT2_GITHUB_TOKEN }}
 
       - name: Create Release Installer
         uses: softprops/action-gh-release@v0.1.15
@@ -120,7 +120,7 @@ jobs:
             **${{ steps.pack.outputs.release_name_install }}**
             ${{ steps.pack.outputs.sha256i }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT2_GITHUB_TOKEN }}
 
   build-macos:
     name: macOS
@@ -184,7 +184,7 @@ jobs:
             **${{ steps.build.outputs.release_name }}**
             ${{ steps.build.outputs.sha256 }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT2_GITHUB_TOKEN }}
 
   build-ubuntu22:
     name: Ubuntu 22.04
@@ -228,7 +228,7 @@ jobs:
             **${{ steps.build.outputs.release_name }}**
             ${{ steps.build.outputs.sha256 }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT2_GITHUB_TOKEN }}
 
   build-ubuntu20:
     name: Ubuntu 20.04
@@ -272,4 +272,4 @@ jobs:
             **${{ steps.build.outputs.release_name }}**
             ${{ steps.build.outputs.sha256 }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT2_GITHUB_TOKEN }}

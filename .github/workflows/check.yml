@@ -1,12 +1,7 @@
-name: Build check
+name: Dogemone Wallet Build Check
 
 on:
-  push:
-    branches:
-      - '**'
-    tags-ignore:
-      - '*'            # We don't want this to run on release
-  pull_request:
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   build-windows:
@@ -19,7 +14,6 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
-          ref: ${{ github.ref }}
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
@@ -50,8 +44,7 @@ jobs:
           VCINSTALLDIR: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\'
         run: |
           $build_folder = "build"
-          $krb_ver = git describe --tags --abbrev=0
-          $release_name = "Karbo-wallet-win64-${krb_ver}"
+          $release_name = "DogemoneWallet-win64-1.0.4"
           $release_folder = "Release"
           echo "$release_name"
           set CMAKE_PREFIX_PATH="$($qt5_cmake)"
@@ -59,18 +52,17 @@ jobs:
           mkdir "$build_folder"
           cd "$build_folder"
           Start-Process cmake -ArgumentList "-DBOOST_ROOT=""$env:BOOST_ROOT"" -DBOOST_INCLUDE_DIRS=""$env:BOOST_ROOT/include"" -G ""Visual Studio 16 2019"" -A x64 -DARCH=default",".." -NoNewWindow -Wait
-          Start-Process msbuild -ArgumentList "KarbowanecWallet.sln","/p:Configuration=Release" -NoNewWindow -Wait
-          $build_path = "./$build_folder"
+          Start-Process msbuild -ArgumentList "DogemoneWallet.sln","/p:Configuration=Release" -NoNewWindow -Wait
           mkdir "$release_folder/$release_name"
           mkdir "$release_folder/$release_name/languages"
           cp languages/*.qm "$release_folder/$release_name/languages/"
           cd "$release_folder"
-          cp KarbowanecWallet.exe "$release_name/"
+          cp DogemoneWallet.exe "$release_name/"
           cp "C:/Program Files/OpenSSL/bin/libssl*.dll" "$release_name/"
           cp "C:/Program Files/OpenSSL/bin/libcrypto*.dll" "$release_name/"
           cp "../../COPYING" "$release_name/LICENSE.txt"
           cp "../../*.bat" "$release_name/"
-          windeployqt --release KarbowanecWallet.exe --dir "$release_name/"
+          windeployqt --release DogemoneWallet.exe --dir "$release_name/"
           Compress-Archive -Path "$release_name/" -DestinationPath "$release_name.zip"
           $sha256a = (Get-FileHash "$release_name.zip").Hash
           $asset_path_archive = "./$build_folder/$release_folder/$release_name.zip"
@@ -80,7 +72,7 @@ jobs:
           cd ../
           makensis WindowsInstall.nsi
           cd "$release_folder"
-          Compress-Archive -Path "KarbowanecWallet-Setup.exe" -DestinationPath "$release_name-install.zip"
+          Compress-Archive -Path "DogemoneWallet-Setup.exe" -DestinationPath "$release_name-install.zip"
           $sha256i = (Get-FileHash "$release_name-install.zip").Hash
           $asset_path_install = "./$build_folder/$release_folder/$release_name-install.zip"
           echo "sha256i=${sha256i}" >> $env:GITHUB_OUTPUT
@@ -93,7 +85,7 @@ jobs:
           path: ${{ steps.build.outputs.asset_path_archive }}
           name: ${{ steps.build.outputs.release_name_archive }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT2_GITHUB_TOKEN }}
 
       - name: Create Installer Artifact
         uses: actions/upload-artifact@v3
@@ -101,7 +93,7 @@ jobs:
           path: ${{ steps.build.outputs.asset_path_install }}
           name: ${{ steps.build.outputs.release_name_install }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT2_GITHUB_TOKEN }}
 
   build-macos:
     name: macOS
@@ -111,7 +103,6 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
-          ref: ${{ github.ref }}
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
@@ -133,9 +124,8 @@ jobs:
         id: build
         run: |
           build_folder="build/release"
-          krb_ver=$(git describe --tags --abbrev=0)
-          release_name="Karbo-wallet-macOS-$krb_ver"
-          app_name="KarbowanecWallet.app"
+          release_name="DogemoneWallet-macOS-1.0.4"
+          app_name="DogemoneWallet.app"
           lang_folder="/Contents/Resources/languages"
           mkdir -p "$build_folder"
           cd "$build_folder"
@@ -151,9 +141,6 @@ jobs:
           echo "sha256=${sha256}" >> $GITHUB_OUTPUT
           echo "release_name=${release_name}.zip" >> $GITHUB_OUTPUT
           echo "asset_path=${asset_path}" >> $GITHUB_OUTPUT
-          echo "krb_ver=${krb_ver}" >> $GITHUB_OUTPUT
-        env:
-          MACOSX_DEPLOYMENT_TARGET: '10.12'
 
       - name: Create Artifact
         uses: actions/upload-artifact@v3
@@ -161,7 +148,7 @@ jobs:
           path: ${{ steps.build.outputs.asset_path }}
           name: ${{ steps.build.outputs.release_name }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT2_GITHUB_TOKEN }}
 
   build-ubuntu22:
     name: Ubuntu 22.04
@@ -171,7 +158,6 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
-          ref: ${{ github.ref }}
 
       - name: Build
         id: build
@@ -179,9 +165,8 @@ jobs:
           sudo apt update -y
           sudo apt install -y qtbase5-dev qttools5-dev qttools5-dev-tools libboost-all-dev
           build_folder="build/release"
-          krb_ver=$(git describe --tags --abbrev=0)
-          release_name=Karbo-wallet-ubuntu-22.04-$krb_ver
-          app_name="KarbowanecWallet"
+          release_name="DogemoneWallet-ubuntu-22.04-1.0.4"
+          app_name="DogemoneWallet"
           mkdir -p "$build_folder"
           cd "$build_folder"
           cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
@@ -193,7 +178,6 @@ jobs:
           echo "sha256=${sha256}" >> $GITHUB_OUTPUT
           echo "release_name=${release_name}.tar.gz" >> $GITHUB_OUTPUT
           echo "asset_path=${asset_path}" >> $GITHUB_OUTPUT
-          echo "krb_ver=${krb_ver}" >> $GITHUB_OUTPUT
 
       - name: Create Artifact
         uses: actions/upload-artifact@v3
@@ -201,7 +185,7 @@ jobs:
           path: ${{ steps.build.outputs.asset_path }}
           name: ${{ steps.build.outputs.release_name }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT2_GITHUB_TOKEN }}
 
   build-ubuntu20:
     name: Ubuntu 20.04
@@ -211,7 +195,6 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
-          ref: ${{ github.ref }}
 
       - name: Build
         id: build
@@ -219,9 +202,8 @@ jobs:
           sudo apt update -y
           sudo apt install -y qt5-default qttools5-dev qttools5-dev-tools libboost-all-dev
           build_folder="build/release"
-          krb_ver=$(git describe --tags --abbrev=0)
-          release_name=Karbo-wallet-ubuntu-20.04-$krb_ver
-          app_name="KarbowanecWallet"
+          release_name="DogemoneWallet-ubuntu-20.04-1.0.4"
+          app_name="DogemoneWallet"
           mkdir -p "$build_folder"
           cd "$build_folder"
           cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
@@ -233,7 +215,6 @@ jobs:
           echo "sha256=${sha256}" >> $GITHUB_OUTPUT
           echo "release_name=${release_name}.tar.gz" >> $GITHUB_OUTPUT
           echo "asset_path=${asset_path}" >> $GITHUB_OUTPUT
-          echo "krb_ver=${krb_ver}" >> $GITHUB_OUTPUT
 
       - name: Create Artifact
         uses: actions/upload-artifact@v3
@@ -241,4 +222,4 @@ jobs:
           path: ${{ steps.build.outputs.asset_path }}
           name: ${{ steps.build.outputs.release_name }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT2_GITHUB_TOKEN }}
