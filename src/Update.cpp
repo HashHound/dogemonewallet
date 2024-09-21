@@ -20,15 +20,7 @@ Updater::Updater(QObject *parent) :
 
 void Updater::checkForUpdate()
 {
-    manager = new QNetworkAccessManager(this);
-    if(manager->networkAccessible() == QNetworkAccessManager::Accessible)
-    {
-        connect(manager, SIGNAL(finished(QNetworkReply*)),
-                this, SLOT(replyFinished(QNetworkReply*)));
-        QNetworkRequest request((QUrl(KARBO_UPDATE_URL)));
-        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-        manager->get(request);
-    }
+  qDebug() << "Check for updates is disabled.";
 }
 
 void Updater::replyFinished (QNetworkReply *reply)

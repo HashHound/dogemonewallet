@@ -6,13 +6,7 @@
 #define UPDATE_H
 
 #include <QObject>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QUrl>
-
-const static QString KARBO_UPDATE_URL   = "https://api.github.com/repos/seredat/karbowanecwallet/tags";
-const static QString KARBO_DOWNLOAD_URL = "https://github.com/seredat/karbowanecwallet/releases/";
+#include <QDebug> // Optional for logging
 
 class Updater : public QObject
 {
@@ -20,19 +14,15 @@ class Updater : public QObject
 public:
     explicit Updater(QObject *parent = 0);
 
+    // Dummy destructor
     ~Updater() {
-        delete manager;
+        // Nothing to clean up as there's no network manager
     }
 
+    // Dummy function for checking updates
     void checkForUpdate();
 
 signals:
-    
-public slots:
-    void replyFinished (QNetworkReply *reply);
-
-private:
-   QNetworkAccessManager *manager;
 
 };
 
