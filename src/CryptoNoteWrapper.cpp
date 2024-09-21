@@ -217,7 +217,7 @@ public:
     // not implemented
     return false;
   }
-  
+
   bool getBlockLongHash(Crypto::cn_context &context, const CryptoNote::Block& block, Crypto::Hash& res) override {
     // unsupported
     return false;
@@ -322,7 +322,7 @@ public:
           m_logger(Logging::WARNING) << "Deep reorganization is allowed!";
         }
         CryptoNote::Checkpoints checkpoints(logManager, allowReorg);
-        checkpoints.load_checkpoints_from_dns();
+        //checkpoints.load_checkpoints_from_dns();
         for (const CryptoNote::CheckpointData& checkpoint : CryptoNote::CHECKPOINTS) {
           checkpoints.add_checkpoint(checkpoint.height, checkpoint.blockId);
         }
@@ -477,7 +477,7 @@ public:
   bool handleBlockFound(CryptoNote::Block& b) override {
     return m_core.handle_block_found(b);
   }
-  
+
   bool getBlockLongHash(Crypto::cn_context &context, const CryptoNote::Block& block, Crypto::Hash& res) override {
     return m_core.getBlockLongHash(context, block, res);
   }
